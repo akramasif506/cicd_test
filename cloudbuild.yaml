@@ -7,10 +7,10 @@ steps:
     args: ['-c', 'pip install -r requirements.txt && pytest test_app.py -v']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/cicd-test-job', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/cicd-test-repo/cicd-test-job', '.']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/cicd-test-job']
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/cicd-test-repo/cicd-test-job']
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
@@ -19,8 +19,18 @@ steps:
       - 'jobs'
       - 'deploy'
       - 'cicd-test-job'
-      - '--image=gcr.io/$PROJECT_ID/cicd-test-job'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/cicd-test-repo/cicd-test-job'
       - '--region=us-central1'
 
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'jobs'
+      - 'execute'
+      - 'cicd-test-job'
+      - '--region=us-central1'
+      - '--wait'
+
 images:
-  - 'gcr.io/$PROJECT_ID/cicd-test-job'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/cicd-test-repo/cicd-test-job'
